@@ -88,6 +88,20 @@ pub fn sequence_in_direction(state: &State, player: Player, row: usize, col: usi
     sequence
 }
 
+pub fn get_winner(state: &State) -> Option<Player> {
+    for player in [Player::Red, Player::Yellow].iter() {
+        let sequences = sequences_all(state, *player);
+
+        for seq in sequences.iter() {
+            if seq.len() >= WIN_LENGTH {
+                return Some(*player);
+            }
+        }
+    }
+
+    None
+}
+
 #[cfg(test)]
 pub mod tests {
     use crate::board::{Player, State};
@@ -293,7 +307,7 @@ pub mod tests {
     }
 
     #[test]
-    pub fn test_sequences_all() {
+    fn test_sequences_all() {
         let mut state = State::new();
         let fields = vec![(2, 3), (3, 2), (4, 1), (5, 0)];
 
@@ -316,6 +330,63 @@ pub mod tests {
             "Expected sequence {:?}, got {:?}",
             fields,
             seqs[0]
+        );
+    }
+
+    #[test]
+    fn test_get_winner_1() {
+        let mut state = State::new();
+
+        state[(2, 3)] = Cell::Player { player: Player::Red };
+        state[(3, 2)] = Cell::Player { player: Player::Red };
+        state[(4, 1)] = Cell::Player { player: Player::Red };
+        state[(5, 0)] = Cell::Player { player: Player::Red };
+
+        let winner = get_winner(&state);
+
+        assert_eq!(
+            winner, Some(Player::Red),
+            "Expected winner to be Red, got {:?}",
+            winner
+        );
+    }
+
+    #[test]
+    fn test_get_winner_2() {
+        let mut state = State::new();
+
+        state[(2, 3)] = Cell::Player { player: Player::Yellow };
+        state[(3, 2)] = Cell::Player { player: Player::Yellow };
+        state[(4, 1)] = Cell::Player { player: Player::Yellow };
+        state[(5, 0)] = Cell::Player { player: Player::Yellow };
+
+        let winner = get_winner(&state);
+
+        assert_eq!(
+            winner, Some(Player::Yellow),
+            "Expected winner to be Yellow, got {:?}",
+            winner
+        );
+    }
+
+    #[test]
+    fn test_get_winner_3() {
+        let mut state = State::new();
+
+        state[(2, 3)] = Cell::Player { player: Player::Red };
+        state[(3, 2)] = Cell::Player { player: Player::Red };
+        state[(4, 1)] = Cell::Player { player: Player::Red };
+
+        state[(2, 2)] = Cell::Player { player: Player::Yellow };
+        state[(3, 1)] = Cell::Player { player: Player::Yellow };
+        state[(4, 0)] = Cell::Player { player: Player::Yellow };
+
+        let winner = get_winner(&state);
+
+        assert_eq!(
+            winner, None,
+            "Expected no winner, got {:?}",
+            winner
         );
     }
 }
