@@ -1,4 +1,4 @@
-use macroquad::{color::{self, Color}, shapes};
+use macroquad::{color::{self, Color}, shapes, text::{draw_text, measure_text}, window::{clear_background, screen_height, screen_width}};
 use crate::board::{Cell, Player, State, COLS, ROWS};
 
 pub const SIZE: f32 = 100.0;
@@ -49,4 +49,37 @@ pub async fn draw_highlight(state: &State, col: usize) {
         SIZE, HEIGHT, 
         color
     )
+}
+
+pub async fn draw_game_over(winner: Option<Player>) {
+    clear_background(color::WHITE);
+
+    let text = match winner {
+        Some(Player::Red) => "Red wins!",
+        Some(Player::Yellow) => "Yellow wins!",
+        None => "It's a draw!",
+    };
+
+    let font_size = 48.0;
+    let text_size = measure_text(text, None, font_size as _, 1.0);
+
+    draw_text(
+        text, 
+        screen_width() / 2. - text_size.width / 2., 
+        screen_height() / 2. - text_size.height / 2., 
+        font_size, 
+        color::BLACK
+    );
+
+    let text = "Press [r] to restart";
+    let font_size = 24.0;
+    let text_size = measure_text(text, None, font_size as _, 1.0);
+
+    draw_text(
+        text, 
+        screen_width() / 2. - text_size.width / 2.,
+        screen_height() / 2. + text_size.height / 2. + 25.0,
+        font_size, 
+        color::BLACK
+    );
 }
