@@ -387,7 +387,7 @@ pub mod tests {
     }
 
     #[test]
-    fn test_player() {
+    fn test_cell_player() {
         let player_cell = Cell::Player { player: Player::Red };
         let empty_cell = Cell::Empty;
 
@@ -461,6 +461,43 @@ pub mod tests {
         assert!(
             Player::Yellow.is_minimizer(),
             "Expected player 2 to be the minimizer, but it wasn't",
+        );
+    }
+
+    #[test]
+    fn test_moves() {
+        let mut state = State::new();
+        assert_eq!(
+            state.moves(), 0,
+            "Expected the number of moves to be 0, but it wasn't",
+        );
+
+        state.drop(0, Player::Red);
+        assert_eq!(
+            state.moves(), 1,
+            "Expected the number of moves to be 1, but it wasn't",
+        );
+
+        state.drop(0, Player::Yellow);
+        assert_eq!(
+            state.moves(), 2,
+            "Expected the number of moves to be 2, but it wasn't",
+        );
+    }
+
+    #[test]
+    fn test_state_player() {
+        let state = State::new();
+        assert_eq!(
+            state.player(), Player::Red,
+            "Expected player 1 to be the first player, but it wasn't",
+        );
+
+        let mut state = State::new();
+        state.drop(0, Player::Red);
+        assert_eq!(
+            state.player(), Player::Yellow,
+            "Expected player 2 to be the second player, but it wasn't",
         );
     }
 }
