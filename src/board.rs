@@ -47,7 +47,7 @@ impl fmt::Display for Board {
 
 /// The state of any connect four board/game. Not necessarily 
 /// valid or current
-#[derive(Clone, PartialEq, Eq, Debug)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct State {
     pub data: Vec<Vec<Cell>>,
 }
@@ -127,6 +127,29 @@ impl fmt::Display for State {
                 s.push_str(&format!("{} ", cell));
             }
             s.push_str("\n");
+        }
+        write!(f, "{}", s)
+    }
+}
+
+impl fmt::Debug for State {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut s = String::new();
+        let mut i = 0;
+        for row in self.data.iter() {
+            for cell in row.iter() {
+                let fmt_cell = match cell {
+                    Cell::Empty => &format!("{}", i),
+                    Cell::Player { player } => match player {
+                        Player::Red => "R",
+                        Player::Yellow => "y"
+                    }
+                };
+
+                s.push_str(fmt_cell);
+            }
+            s.push_str("\n");
+            i += 1;
         }
         write!(f, "{}", s)
     }
