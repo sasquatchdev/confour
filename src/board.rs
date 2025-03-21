@@ -67,6 +67,21 @@ impl State {
         }
     }
 
+    /// Returns the playe whose turn it is
+    pub fn player(&self) -> Player {
+        // Designates the first player as Player::Red
+        if self.moves() % 2 == 0 {
+            Player::Red
+        } else {
+            Player::Yellow
+        }
+    }
+
+    /// Returns the number of moves made so far
+    pub fn moves(&self) -> usize {
+        self.data.iter().flatten().filter(|cell| !cell.is_empty()).collect::<Vec<_>>().len()
+    }
+
     /// Returns true if the board is full
     pub fn is_full(&self) -> bool {
         self.data.iter().all(|row| row.iter().all(|cell| *cell != Cell::Empty))
