@@ -217,3 +217,212 @@ impl fmt::Display for Player {
         }
     }
 }
+
+/// Unit and integration tests for logic
+/// concerning the board and its state
+#[cfg(test)]
+pub mod tests {
+    use super::*;
+
+    #[test]
+    /// Tests the `from_data` method of the State struct,
+    /// kind of a trivial test but it's a start
+    fn test_from_data() {
+        let data = vec![vec![Cell::Empty; COLS]; ROWS];
+        let state = State::from_data(data.clone());
+        
+        assert_eq!(
+            state.data, data,
+            "Expected the data to be the same, but it wasn't",
+        );
+        
+        assert_eq!(
+            ROWS, state.data.len(),
+            "Expected the number of rows to be {}, but it wasn't",
+            ROWS,
+        );
+        
+        assert_eq!(
+            COLS, state.data[0].len(),
+            "Expected the number of columns to be {}, but it wasn't",
+            COLS,
+        );
+    }
+
+    #[test]
+    /// Tests the `is_full` method of the State struct
+    /// both positive and negative cases
+    fn test_is_full() {
+        let mut state = State::new();
+        
+        assert!(
+            !state.is_full(),
+            "Expected an empty board to not be full, but it was",
+        );
+        
+        for col in 0..COLS {
+            for row in 0..ROWS {
+                state[(row, col)] = Cell::Player { player: Player::Red };
+            }
+        }
+        assert!(
+            state.is_full(),
+            "Expected a full board to be full, but it wasn't",
+        );
+    }
+
+    #[test]
+    /// Tests the `is_valid` method of the State struct
+    /// by filling up the board and checking if the columns
+    /// are still valid
+    fn test_is_valid() {
+        let mut state = State::new();
+        
+        for col in 0..COLS {
+            assert!(
+                state.is_valid(col),
+                "Expected an empty board to result in all valid columns, but it didn't",
+            );
+        }
+        
+        for row in 0..ROWS {
+            for col in 0..COLS {
+                state[(row, col)] = Cell::Player { player: Player::Red };
+            }
+        }
+        for col in 0..COLS {
+            assert!(
+                !state.is_valid(col),
+                "Expected a full board to result in no valid columns, but it didn't",
+            );
+        }
+    }
+
+    #[test]
+    /// Tests the `drop` method of the State struct
+    /// by dropping a piece into a column and checking
+    /// if it landed in the correct row
+    fn test_drop() {
+        let mut state = State::new();
+        
+        state.drop(0, Player::Red);
+        assert_eq!(
+            state[(ROWS - 1, 0)], Cell::Player { player: Player::Red },
+            "Expected player 1 to be in the last row of the column, but it wasn't",
+        );
+        
+        state.drop(0, Player::Yellow);
+        assert_eq!(
+            state[(ROWS - 2, 0)], Cell::Player { player: Player::Yellow },
+            "Expected player 2 to be in the second to last row of the column, but it wasn't",
+        );
+    }
+
+    #[test]
+    fn test_dropped() {
+        let state = State::new();
+        let new_state = state.dropped(0, Player::Red);
+
+        assert_eq!(
+            new_state[(ROWS - 1, 0)], Cell::Player { player: Player::Red },
+            "Expected player 1 to be in the last row of the column, but it wasn't",
+        );
+    }
+
+    #[test]
+    fn test_index() {
+        let state = State::new();
+        assert_eq!(
+            state[(0, 0)], Cell::Empty,
+            "Expected the cell at (0, 0) to be accessible yet empty, but it wasn't",
+        );
+    }
+
+    #[test]
+    fn test_index_mut() {
+        let mut state = State::new();
+        state[(0, 0)] = Cell::Player { player: Player::Red };
+        assert_eq!(
+            state[(0, 0)], Cell::Player { player: Player::Red },
+            "Expected the cell at (0, 0) to be player 1, but it wasn't",
+        );
+    }
+
+    #[test]
+    fn test_player() {
+        let player_cell = Cell::Player { player: Player::Red };
+        let empty_cell = Cell::Empty;
+
+        assert!(
+            player_cell.player().is_some(),
+            "Expected a player cell to have a player, but it didn't",
+        );
+
+        assert_eq!(
+            player_cell.player().unwrap(), Player::Red,
+            "Expected the player to be player 1 / red, but it wasn't",
+        );
+
+        assert!(
+            empty_cell.player().is_none(),
+            "Expected an empty cell to not have a player, but it did",
+        );
+
+        assert!(
+            empty_cell.is_empty(),
+            "Expected an empty cell to be empty, but it wasn't",
+        );
+    }
+
+    #[test]
+    fn test_other() {
+        assert_eq!(
+            Player::Red.other(), Player::Yellow,
+            "Expected player 1's opponent to be player 2, but it wasn't",
+        );
+
+        assert_eq!(
+            Player::Yellow.other(), Player::Red,
+            "Expected player 2's opponent to be player 1, but it wasn't",
+        );
+    }
+
+    #[test]
+    fn test_is_opponent() {
+        assert!(
+            Player::Red.is_opponent(Player::Yellow),
+            "Expected player 1 to be player 2's opponent, but it wasn't",
+        );
+
+        assert!(
+            Player::Yellow.is_opponent(Player::Red),
+            "Expected player 2 to be player 1's opponent, but it wasn't",
+        );
+    }
+
+    #[test]
+    fn test_is_maximizer() {
+        assert!(
+            Player::Red.is_maximizer(),
+            "Expected player 1 to be the maximizer, but it wasn't",
+        );
+
+        assert!(
+            !Player::Yellow.is_maximizer(),
+            "Expected player 2 to not be the maximizer, but it was",
+        );
+    }
+
+    #[test]
+    fn test_is_minimizer() {
+        assert!(
+            !Player::Red.is_minimizer(),
+            "Expected player 1 to not be the minimizer, but it was",
+        );
+
+        assert!(
+            Player::Yellow.is_minimizer(),
+            "Expected player 2 to be the minimizer, but it wasn't",
+        );
+    }
+}
