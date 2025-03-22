@@ -23,6 +23,7 @@ async fn main() {
 
     thread::spawn(move || {
         async_std::task::block_on(async {
+            let mut table = eval::minimax::TranspositionTable::new();
             loop {
                 {
                     let should_eval;
@@ -32,7 +33,7 @@ async fn main() {
                     }
     
                     if should_eval {
-                        let col = eval_omove(&board).await;
+                        let col = eval_omove(&board, &mut table).await;
                         let mut board = board_eval.lock().unwrap();
                         let state = board.state_mut();
                         state.drop(col.unwrap(), MINIMIZER);
@@ -49,7 +50,7 @@ async fn main() {
     }
 }
 
-async fn eval_omove(board: &Mutex<Board>) 
+async fn eval_omove(board: &Mutex<Board>, tt: &mut eval::minimax::TranspositionTable) 
     -> Option<usize>
 {
     let state;
@@ -62,7 +63,7 @@ async fn eval_omove(board: &Mutex<Board>)
         state = board.lock().unwrap().state().clone();
     }
 
-    let best = state.best(DEPTH, MINIMIZER);
+    let best = state.best(DEPTH, MINIMIZER, tt);
 
     best
 }
