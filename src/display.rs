@@ -1,5 +1,5 @@
-use macroquad::{color::{self, Color}, shapes, text::{draw_text, measure_text}, window::{clear_background, screen_height, screen_width}};
-use crate::board::{Cell, Player, State, COLS, ROWS};
+use macroquad::{color::{self, Color}, shapes::{self, draw_rectangle}, text::{draw_text, measure_text}, window::{screen_height, screen_width}};
+use crate::{board::{Cell, Player, State, COLS, MAXIMIZER, ROWS}, detect::sequences_all};
 
 pub const SIZE: f32 = 100.0;
 
@@ -51,9 +51,34 @@ pub async fn draw_highlight(state: &State, col: usize) {
     )
 }
 
-pub async fn draw_game_over(winner: Option<Player>) {
-    clear_background(color::WHITE);
+pub async fn draw_game_over(state: &State, winner: Option<Player>) {
+    draw_board(&state).await;
+    
+    if let Some(player) = winner {
+        let seqs = sequences_all(state, player)
+            .into_iter()
+            .filter(|seq| seq.len() >= 4);
 
+        for seq in seqs {
+            let start = seq[0];
+            let end = seq[seq.len() - 1];
+
+            let x1 = start.1 as f32 * SIZE + MARGIN + SIZE / 2.0;
+            let y1 = start.0 as f32 * SIZE + MARGIN + SIZE / 2.0;
+
+            let x2 = end.1 as f32 * SIZE + MARGIN + SIZE / 2.0;
+            let y2 = end.0 as f32 * SIZE + MARGIN + SIZE / 2.0;
+
+            shapes::draw_line(x1, y1, x2, y2, 12.0, if player == MAXIMIZER {
+                color::YELLOW
+            } else {
+                color::RED
+            });
+        }
+    }
+    
+    draw_rectangle(0.0, 0.0, screen_width(), screen_height(), Color::from_rgba(255, 255, 255, 128));
+    
     let text = match winner {
         Some(Player::Red) => "Red wins!",
         Some(Player::Yellow) => "Yellow wins!",
