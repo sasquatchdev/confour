@@ -1,4 +1,4 @@
-use std::{fmt, ops::{Index, IndexMut}};
+use std::{fmt, hash::{DefaultHasher, Hash, Hasher}, ops::{Index, IndexMut}};
 
 /// Defines which player (in the minimax algorithm)
 /// is favored by a high (positive) score.
@@ -47,9 +47,9 @@ impl fmt::Display for Board {
 
 /// The state of any connect four board/game. Not necessarily 
 /// valid or current
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct State {
-    pub data: Vec<Vec<Cell>>,
+    pub data: Vec<Vec<Cell>>
 }
 
 impl State {
@@ -58,6 +58,13 @@ impl State {
         State {
             data: vec![vec![Cell::Empty; COLS]; ROWS]
         }
+    }
+
+    /// A simple wrapper around the `hash` method
+    pub fn hash_value(&self) -> u64 {
+        let mut hasher = DefaultHasher::new();
+        self.hash(&mut hasher);
+        return hasher.finish();
     }
 
     /// Create a new state from a 2D vector of cells
@@ -183,7 +190,7 @@ impl fmt::Debug for State {
 }
 
 /// The state of any given cell (or "position") on the board
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Hash)]
 pub enum Cell {
     Empty,                      // No player occupies the cell
     Player { player: Player }   // A player occupies the cell
@@ -223,7 +230,7 @@ impl fmt::Display for Cell {
 }
 
 /// An enum representing all possible players
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Hash)]
 pub enum Player {
     Red,        // Player 1
     Yellow      // Player 2
