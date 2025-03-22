@@ -87,10 +87,22 @@ impl State {
         self.data.iter().all(|row| row.iter().all(|cell| *cell != Cell::Empty))
     }
 
+    /// Retrusn whether the game is over
+    /// (i.e. the board is full or there is a winner)
+    pub fn is_terminal(&self) -> bool {
+        return self.is_full() || self.get_winner().is_some();
+    }
+
     /// Returns true if dropping a piece into the given
     /// column is a valid move
     pub fn is_valid(&self, col: usize) -> bool {
         col < COLS && self[(0, col)] == Cell::Empty
+    }
+
+    /// Returns all the possible columns that a piece
+    /// can be dropped into
+    pub fn get_valid(&self) -> Vec<usize> {
+        (0..COLS).filter(|&col| self.is_valid(col)).collect()
     }
 
     /// Drop a piece into the given column and update
