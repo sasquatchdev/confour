@@ -7,12 +7,17 @@ A connect four game featuring a virtual opponent written in rust
 ## Table of Contents
 
 - [Introduction](#introduction)
+- [Known Issues](#known-issues)
 - [Features](#features)
 - [Installation & Usage](#installation--usage)
 
 ## Introduction
 
 This project features a connect four game including a virtual opponent / bot. This opponent is implemented using a variant of the [minimax](https://en.wikipedia.org/wiki/Minimax) called ["negamax"](https://en.wikipedia.org/wiki/Negamax).
+
+## Known Issues
+
+- _(minor)_ _[algorithm]_ Sometimes, opponent does not (immediately) take winning move
 
 ## Features
 
