@@ -1,5 +1,4 @@
 use board::Board;
-use detect::get_winner;
 use display::{HEIGHT, MARGIN, SIZE, WIDTH};
 
 use macroquad::{input::{is_key_down, is_mouse_button_pressed, mouse_position, KeyCode, MouseButton}, miniquad::window::set_window_size, window::next_frame};
@@ -23,7 +22,7 @@ async fn main() {
 
 
 async fn tick(board: &mut Board) {
-    if get_winner(board.state()).is_some() || board.state().is_full() {
+    if board.state().get_winner().is_some() || board.state().is_full() {
         if is_key_down(KeyCode::R) {
             *board = Board::new();
         }
@@ -39,7 +38,7 @@ async fn tick(board: &mut Board) {
 }
 
 async fn draw(board: &mut Board) {
-    if let Some(winner) = get_winner(board.state()) {
+    if let Some(winner) = board.state().get_winner() {
         display::draw_game_over(Some(winner)).await;
         return;
     } else if board.state().is_full() {

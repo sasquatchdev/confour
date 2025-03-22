@@ -88,18 +88,20 @@ pub fn sequence_in_direction(state: &State, player: Player, row: usize, col: usi
     sequence
 }
 
-pub fn get_winner(state: &State) -> Option<Player> {
-    for player in [Player::Red, Player::Yellow].iter() {
-        let sequences = sequences_all(state, *player);
-
-        for seq in sequences.iter() {
-            if seq.len() >= WIN_LENGTH {
-                return Some(*player);
+impl State {
+    pub fn get_winner(&self) -> Option<Player> {
+        for player in [Player::Red, Player::Yellow].iter() {
+            let sequences = sequences_all(self, *player);
+    
+            for seq in sequences.iter() {
+                if seq.len() >= WIN_LENGTH {
+                    return Some(*player);
+                }
             }
         }
+    
+        None
     }
-
-    None
 }
 
 #[cfg(test)]
@@ -342,7 +344,7 @@ pub mod tests {
         state[(4, 1)] = Cell::Player { player: Player::Red };
         state[(5, 0)] = Cell::Player { player: Player::Red };
 
-        let winner = get_winner(&state);
+        let winner = state.get_winner();
 
         assert_eq!(
             winner, Some(Player::Red),
@@ -360,7 +362,7 @@ pub mod tests {
         state[(4, 1)] = Cell::Player { player: Player::Yellow };
         state[(5, 0)] = Cell::Player { player: Player::Yellow };
 
-        let winner = get_winner(&state);
+        let winner = state.get_winner();
 
         assert_eq!(
             winner, Some(Player::Yellow),
@@ -381,7 +383,7 @@ pub mod tests {
         state[(3, 1)] = Cell::Player { player: Player::Yellow };
         state[(4, 0)] = Cell::Player { player: Player::Yellow };
 
-        let winner = get_winner(&state);
+        let winner = state.get_winner();
 
         assert_eq!(
             winner, None,
