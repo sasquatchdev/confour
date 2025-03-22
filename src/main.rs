@@ -1,4 +1,4 @@
-use board::Board;
+use board::{Board, MINIMIZER};
 use display::{HEIGHT, MARGIN, SIZE, WIDTH};
 
 use macroquad::{input::{is_key_down, is_mouse_button_pressed, mouse_position, KeyCode, MouseButton}, miniquad::window::set_window_size, window::next_frame};
@@ -6,6 +6,7 @@ use macroquad::{input::{is_key_down, is_mouse_button_pressed, mouse_position, Ke
 pub mod board;
 pub mod detect;
 pub mod display;
+pub mod eval;
 
 #[macroquad::main("ConFour")]
 async fn main() {
@@ -22,6 +23,15 @@ async fn main() {
 
 
 async fn tick(board: &mut Board) {
+    if board.state().player() == MINIMIZER {
+        let best = board.state().best(6, MINIMIZER);
+        if let Some(col) = best {
+            board.state_mut().drop(col, MINIMIZER);
+        } else {
+            println!("ERR: No best move found for MINIMIZER");
+        }
+    }
+
     if board.state().get_winner().is_some() || board.state().is_full() {
         if is_key_down(KeyCode::R) {
             *board = Board::new();
