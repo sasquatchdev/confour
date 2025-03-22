@@ -22,7 +22,7 @@ This project features a connect four game including a virtual opponent / bot. Th
 ## Features
 
 - Play a 1v1 game of connect four against a bot
-    - $\alpha$-$\beta$-pruning
+    - alpha-beta-pruning
     - transposition table
     - _(planned)_ move ordering
 - _(planned)_ Play a 1v1 game against someone else (local multiplayer)
